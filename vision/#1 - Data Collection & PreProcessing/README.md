@@ -41,6 +41,3 @@ To download the datasets from RoboFlow in Pascal VOC format, follow these steps:
 6. **Download the dataset**:
    - Click the "Download" button, and the dataset will be downloaded in Pascal VOC format, which will include both images and annotation files (`.xml` format).
 
-## Citation and Acknowledgments
-
-If you use any of the datasets in your research or projects, please make sure to cite the respective authors and datasets according to the information provided on their respective download pages.
