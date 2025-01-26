@@ -10,7 +10,7 @@ This repository contains information on various datasets used for plant and toma
 2. **[Early Plant Disease Detection - RoboFlow](https://universe.roboflow.com/srec/early)**
    - The Early Plant Disease Detection dataset includes annotated images for early detection of plant diseases.
 
-3. **[Tomato Leaf Disease Detection - Kaggle](https://www.kaggle.com/datasets/farukalam/tomato-leaf-diseases-detection-computer-vision/code)**
+3. **[Tomato Leaf Disease Detection - Kaggle](https://www.kaggle.com/datasets/farukalam/tomato-leaf-diseases-detection-computer-vision/data)**
    - A Kaggle dataset containing images of tomato leaves for detecting various types of leaf diseases.
 
 4. **[Tomato Leaf Disease - RoboFlow](https://universe.roboflow.com/bryan-b56jm/tomato-leaf-disease-ssoha)**
