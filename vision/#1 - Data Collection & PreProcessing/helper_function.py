@@ -56,8 +56,23 @@ def ExtractLabel(filepath):
             parser.append([image_name, width, height, name, xmin, xmax, ymin, ymax])
         return parser
 
+# Convert Function Maps the Five numbers of Cordinates to four Numbers for bounding box
+def Convert_coordinates(width, height, xmin, xmax, ymin, ymax):
+    '''
+    Functionality of this function Converts bounding box coordinates (xmin, xmax, ymin, ymax)
+    to normalized center coordinates (x_center, y_center) and relative width/height.
+    Returns:
+        x_center, y_center, new_width, new_height (all normalized to [0, 1])
+    '''
+    new_width = (xmax - xmin) / width
+    new_height = (ymax - ymin) / height
+    x_center = (xmin / width) + (new_width / 2)
+    y_center = (ymin / height) + (new_height / 2)
+
+    return x_center , y_center , new_width , new_height
+
 if __name__ == '__main__':
     CreateHierarchicalFolders()
 
-    
+
     
