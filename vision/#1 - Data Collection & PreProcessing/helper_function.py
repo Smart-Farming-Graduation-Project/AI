@@ -58,3 +58,6 @@ def ExtractLabel(filepath):
 
 if __name__ == '__main__':
     CreateHierarchicalFolders()
+
+    
+    
