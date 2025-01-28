@@ -87,6 +87,50 @@ def getPaths(pathfile):
     return images_paths, label_paths
     
 
+# Function To Mapping Class Name To ID and vice-versa
+
+Map_Class_To_Number = {}
+Map_Number_To_Class = {}
+counter = 1
+
+def map_class_to_number(class_name):
+    
+    global counter, Map_Class_To_Number, Map_Number_To_Class
+    
+    if class_name not in Map_Class_To_Number:
+        Map_Class_To_Number[class_name] = counter
+        Map_Number_To_Class[counter] = class_name
+        counter += 1
+    return Map_Class_To_Number[class_name]
+
+def map_number_to_class(number):
+    
+    global Map_Number_To_Class
+    
+    if number in Map_Number_To_Class:
+        return Map_Number_To_Class[number]
+    return "Class Not Found"
+
+
+print(map_class_to_number("A"))  
+print(map_class_to_number("B"))  
+print(map_class_to_number("C"))  
+
+print("-" * 30)
+# if class name came as a list
+class_names = ["D", "E" , "F" , "G"]  
+for class_name in class_names:
+    print(map_class_to_number(class_name))
+
+print("-" * 30)
+
+print(map_number_to_class(1))  
+print(map_number_to_class(2))  
+print(map_number_to_class(3))  
+print(map_number_to_class(4))
+
+
+
 if __name__ == '__main__':
     pass
     
