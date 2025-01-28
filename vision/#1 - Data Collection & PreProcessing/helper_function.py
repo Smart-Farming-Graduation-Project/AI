@@ -71,6 +71,22 @@ def Convert_coordinates(width, height, xmin, xmax, ymin, ymax):
 
     return x_center , y_center , new_width , new_height
 
+# Function To Get Paths For All Images And Labels In Folder
+def getPaths(pathfile):
+    '''
+        This Function To Collect Paths For All Images And Annotation (xml) file in folder
+        Note -> Path Must Pass As Raw String
+        parameters -> Take PathFile That Contain images plus annotation 
+        return     -> Return List Of Images Paths And Labeld Paths
+    '''
+     
+    # this line to get the extension of images like (.jpg, .png, ...)
+    img_ext = os.path.splitext(os.listdir(pathfile)[0])[1]
+    images_paths = glob.glob(pathfile + '/*' + img_ext)
+    label_paths = glob.glob(pathfile + '/*.xml')
+    return images_paths, label_paths
+    
+
 if __name__ == '__main__':
     pass
     
