@@ -14,7 +14,7 @@ def CreateHierarchicalFolders(ParentFile = 'Data'):
             test  -> images, label
         )
     '''
-    if not os.path.exists('ParentFile') :
+    if not os.path.exists(ParentFile) :
         os.makedirs(ParentFile + '/train' + '/images')
         os.makedirs(ParentFile + '/train' + '/label')
         os.makedirs(ParentFile + '/val' + '/images')
@@ -72,7 +72,5 @@ def Convert_coordinates(width, height, xmin, xmax, ymin, ymax):
     return x_center , y_center , new_width , new_height
 
 if __name__ == '__main__':
-    CreateHierarchicalFolders()
-
-
+    pass
     
