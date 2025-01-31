@@ -3,6 +3,8 @@ import pandas as pd
 import shutil
 import os
 from xml.etree import ElementTree as et
+import cv2
+import matplotlib.pyplot as plt
 
 
 # Function To Create Train, Test, Validation Folders
@@ -164,6 +166,54 @@ def save_label(label_path , content):
         file.write(content)
 
 
+# This Function Return Detected Image as a array
+def Return_Detected_Image(image, x_center, y_center, new_width, new_height, annotation) :
+    img_height, img_width = image.shape[:2]  
 
+    xmin = int((x_center - new_width / 2) * img_width)
+    xmax = int((x_center + new_width / 2) * img_width)
+    ymin = int((y_center - new_height / 2) * img_height)
+    ymax = int((y_center + new_height / 2) * img_height)
+
+    R_color = (255, 0, 0)  
+    A_color = (0,0,0)  
+    thickness = 2  
+    cv2.rectangle(image, (xmin, ymin), (xmax, ymax), R_color, thickness)
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 1
+    font_thickness = 2
+
+    (text_width, text_height), _ = cv2.getTextSize(annotation, font, font_scale, font_thickness)
+    text_x = xmin
+    text_y = ymin - 10 if ymin - 10 > 10 else ymin + 20  
+
+    cv2.putText(image, annotation, (text_x, text_y), font, font_scale, A_color, font_thickness)
+
+    return image
+
+
+
+# Display Function used to visulize The Image After Desease Detection with Desease Name 
+def Display(image, x_center, y_center, new_width, new_height, annotation , display='external'):
+    
+    Return_Detected_Image(image, x_center, y_center, new_width, new_height, annotation)
+
+    if display == 'external':
+        window_name = 'Detected Image'
+        cv2.namedWindow(window_name, cv2.WINDOW_NORMAL) 
+        cv2.resizeWindow(window_name, 600, 600)  
+        cv2.moveWindow(window_name, 150, 50)  
+        cv2.imshow(window_name, image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+    elif display == 'internal' :
+        plt.imshow(image)  
+        plt.axis('off')   
+        plt.show()         
+
+
+
+ # Main Function       
 if __name__ == '__main__':
     pass
