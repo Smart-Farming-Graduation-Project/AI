@@ -3,13 +3,10 @@ import pandas as pd
 import shutil
 import os
 from xml.etree import ElementTree as et
-<<<<<<< HEAD
 from tqdm import tqdm
-=======
 import cv2
 import matplotlib.pyplot as plt
 
->>>>>>> 8dfb8d6a3a0354fda247bab713ad94635e0f3b6e
 
 # Function To Create Train, Test, Validation Folders
 def CreateHierarchicalFolders(ParentFile='Data', train = True, test = True, val = True):
@@ -212,7 +209,6 @@ def save_label(label_path , content):
         file.write(content)
 
 
-<<<<<<< HEAD
 def MergePaths(paths_list):
     all_img, all_label = [], []
     for file_path in paths_list:
@@ -221,11 +217,10 @@ def MergePaths(paths_list):
         all_label.extend(lbl_path)
     return all_img, all_label
 
-=======
+
 # This Function Return Detected Image as a array
 def Return_Detected_Image(image, x_center, y_center, new_width, new_height, annotation) :
     img_height, img_width = image.shape[:2]  
->>>>>>> 8dfb8d6a3a0354fda247bab713ad94635e0f3b6e
 
     xmin = int((x_center - new_width / 2) * img_width)
     xmax = int((x_center + new_width / 2) * img_width)
