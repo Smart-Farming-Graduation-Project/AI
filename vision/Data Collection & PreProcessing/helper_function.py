@@ -3,12 +3,13 @@ import pandas as pd
 import shutil
 import os
 from xml.etree import ElementTree as et
+from tqdm import tqdm
 import cv2
 import matplotlib.pyplot as plt
 
 
 # Function To Create Train, Test, Validation Folders
-def CreateHierarchicalFolders(ParentFile='Data'):
+def CreateHierarchicalFolders(ParentFile='Data', train = True, test = True, val = True):
     '''
         This Function Used To Create Folders To Contain Data In Structure 
         (
@@ -18,12 +19,16 @@ def CreateHierarchicalFolders(ParentFile='Data'):
         )
     '''
     if not os.path.exists(ParentFile):
-        os.makedirs(ParentFile + '/train' + '/images')
-        os.makedirs(ParentFile + '/train' + '/label')
-        os.makedirs(ParentFile + '/val' + '/images')
-        os.makedirs(ParentFile + '/val' + '/label')
-        os.makedirs(ParentFile + '/test' + '/images')
-        os.makedirs(ParentFile + '/test' + '/label')
+        if train :
+            os.makedirs(ParentFile + '/train' + '/images')
+            os.makedirs(ParentFile + '/train' + '/label')
+        if val :
+            os.makedirs(ParentFile + '/val' + '/images')
+            os.makedirs(ParentFile + '/val' + '/label')
+        if test :
+            os.makedirs(ParentFile + '/test' + '/images')
+            os.makedirs(ParentFile + '/test' + '/label')
+
         print("All File Created 👌")
         return True
     else:
@@ -39,6 +44,7 @@ def ExtractLabel(filepath):
         Return -> List Contain All Objects In Image
     '''
     # Get Root Of Hierarchical
+    
     root = et.parse(filepath).getroot()
 
     # Get Name Image, Width, Height
@@ -87,14 +93,50 @@ def getPaths(pathfile):
         parameters -> Take PathFile That Contain images plus annotation 
         return     -> Return List Of Images Paths And Labeld Paths
     '''
-
     # this line to get the extension of images like (.jpg, .png, ...)
-    img_ext = os.path.splitext(os.listdir(pathfile)[0])[1]
-    images_paths = glob.glob(pathfile + '/*' + img_ext)
-    label_paths = glob.glob(pathfile + '/*.xml')
+    images_paths = glob.glob(pathfile + '*.jpg')
+    label_paths = glob.glob(pathfile + '*.xml')
     return images_paths, label_paths
 
 
+class_id = {
+    'Bell_pepper leaf spot': 1,
+    'Potato leaf early blight': 2,
+    'Strawberry leaf': 3,
+    'grape leaf': 4,
+    'grape leaf black rot': 5,
+    'Tomato leaf': 6,
+    'Bell_pepper leaf': 7,
+    'Potato leaf': 8,
+    'Peach leaf': 9,
+    'Corn leaf blight': 10,
+    'Apple Scab Leaf': 11,
+    'Cherry leaf': 12,
+    'Tomato leaf bacterial spot': 13,
+    'Tomato leaf yellow virus': 14,
+    'Corn Gray leaf spot': 15,
+    'Apple rust leaf': 16,
+    'Raspberry leaf': 17,
+    'Blueberry leaf': 18,
+    'Squash Powdery mildew leaf': 19,
+    'Tomato mold leaf': 20,
+    'Tomato Early blight leaf': 21,
+    'Tomato leaf late blight': 22,
+    'Tomato Septoria leaf spot': 23,
+    'Tomato leaf mosaic virus': 24,
+    'Potato leaf late blight': 25,
+    'Apple leaf': 26,
+    'Corn rust leaf': 27,
+    'Soyabean leaf': 28,
+    'Tomato two spotted spider mites leaf': 29
+}
+
+#  Encoding Name Of Object
+def label_encoding(x):
+    global class_id
+    return class_id[x]
+
+'''
 # Function To Mapping Class Name To ID and vice-versa
 
 Map_Class_To_Number = {}
@@ -138,32 +180,42 @@ print(map_number_to_class(1))
 print(map_number_to_class(2))
 print(map_number_to_class(3))
 print(map_number_to_class(4))
+'''
 
 
-
-def save_image_and_annotation(df:pd.DataFrame , dst_annotation_dir , dst_image_dir):
-    gr_by = df.groupby("path")
+def save_image_and_annotation(df:pd.DataFrame , dst_annotation_dir , dst_image_dir, src):
+    counter = 1
+    gr_by = df.groupby("filename")
     SEP = os.sep
-    for path, groups in gr_by:
-        label_path = dst_annotation_dir + SEP + path.split(SEP)[-1][0:-3] + 'txt'
+    for path, groups in tqdm(gr_by):
+        label_path = dst_annotation_dir + str(counter) + '.txt'
         content = ""
         for i, row in groups.iterrows():
-            x_center, y_center, width, height = row['x_center'], row['y_center'], row['new_width'], row['new_height']
-            image_id = row["image_id"]
+            image_id, x_center, y_center, width, height = row["id"], row['center_x'], row['center_y'], row['w'], row['h']
             content += f"{image_id} {width} {height} {x_center} {y_center}"
             if i != len(groups)-1:
                 content += "\n"
-        save_label(label_path, content)
-        shutil.copy(path, dst_image_dir + SEP + path.split(SEP)[-1])
-        print("Successfully added")
-
-
-
+        try:
+            save_label(label_path, content)
+            shutil.copy(src + path, dst_image_dir + SEP + str(counter) + '.jpg')
+            print("Successfully added")
+            counter += 1
+        except :
+            pass
 
 
 def save_label(label_path , content):
     with open(label_path,"w+") as file:
         file.write(content)
+
+
+def MergePaths(paths_list):
+    all_img, all_label = [], []
+    for file_path in paths_list:
+        img_path, lbl_path = getPaths(file_path)
+        all_img.extend(img_path)
+        all_label.extend(lbl_path)
+    return all_img, all_label
 
 
 # This Function Return Detected Image as a array
@@ -205,6 +257,8 @@ def Return_Detected_Image(image, boxes):
         cv2.putText(image, annotation, (text_x, text_y), font, font_scale, (255, 255, 255), font_thickness)
 
     return image
+
+
 
 
 
