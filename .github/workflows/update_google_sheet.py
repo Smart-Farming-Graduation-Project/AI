@@ -76,7 +76,7 @@ def update_google_sheet(ID, Task_Name, Assigned_Member, Assigned_Date, Date_Comp
 
     if task_row:
      
-        range_to_update = f"Web!A{task_row}:I{task_row}"
+        range_to_update = f"AI!A{task_row}:I{task_row}"
         body = {
             'values': [row_data]
         }
