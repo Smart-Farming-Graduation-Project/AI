@@ -219,50 +219,67 @@ def MergePaths(paths_list):
 
 
 # This Function Return Detected Image as a array
-def Return_Detected_Image(image, x_center, y_center, new_width, new_height, annotation) :
+def Return_Detected_Image(image, boxes):
+    """
+    Draws multiple bounding boxes and annotations on an image.
+    Args:
+        image: The input image (numpy array).
+        boxes: A list of bounding boxes, where each box is a list of the form:
+               [[x_center, y_center, new_width, new_height, annotation], Box2 , .....]
+    Returns:
+        The image with bounding boxes and annotations drawn.
+    """
     img_height, img_width = image.shape[:2]  
 
-    xmin = int((x_center - new_width / 2) * img_width)
-    xmax = int((x_center + new_width / 2) * img_width)
-    ymin = int((y_center - new_height / 2) * img_height)
-    ymax = int((y_center + new_height / 2) * img_height)
-
     R_color = (255, 0, 0)  
-    A_color = (0,0,0)  
-    thickness = 2  
-    cv2.rectangle(image, (xmin, ymin), (xmax, ymax), R_color, thickness)
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 1
-    font_thickness = 2
+    A_color = (0, 0, 0)    
+    thickness = 2          
+    font =  cv2.FONT_HERSHEY_TRIPLEX
+    font_scale = 0.7       
+    font_thickness = 1     
 
-    (text_width, text_height), _ = cv2.getTextSize(annotation, font, font_scale, font_thickness)
-    text_x = xmin
-    text_y = ymin - 10 if ymin - 10 > 10 else ymin + 20  
+    for box in boxes:
+        x_center, y_center, new_width, new_height, annotation = box
 
-    cv2.putText(image, annotation, (text_x, text_y), font, font_scale, A_color, font_thickness)
+        xmin = int((x_center - new_width / 2) * img_width)
+        xmax = int((x_center + new_width / 2) * img_width)
+        ymin = int((y_center - new_height / 2) * img_height)
+        ymax = int((y_center + new_height / 2) * img_height)
+
+        cv2.rectangle(image, (xmin, ymin), (xmax, ymax), R_color, thickness)
+
+        (text_width, text_height), _ = cv2.getTextSize(annotation, font, font_scale, font_thickness)
+        text_x = xmin
+        text_y = ymin - 5 if ymin - 5 > 5 else ymin + 20  
+
+        cv2.rectangle(image, (text_x, text_y - text_height), (text_x + text_width, text_y), R_color, -1)
+        
+        cv2.putText(image, annotation, (text_x, text_y), font, font_scale, (255, 255, 255), font_thickness)
 
     return image
 
 
 
+
+
 # Display Function used to visulize The Image After Desease Detection with Desease Name 
-def Display(image, x_center, y_center, new_width, new_height, annotation , display='external'):
-    
-    Return_Detected_Image(image, x_center, y_center, new_width, new_height, annotation)
+def Display(image, boxes, display='external'):
+
+    image_with_boxes = Return_Detected_Image(image, boxes)
 
     if display == 'external':
         window_name = 'Detected Image'
         cv2.namedWindow(window_name, cv2.WINDOW_NORMAL) 
         cv2.resizeWindow(window_name, 600, 600)  
         cv2.moveWindow(window_name, 150, 50)  
-        cv2.imshow(window_name, image)
+        cv2.imshow(window_name, image_with_boxes)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    elif display == 'internal' :
-        plt.imshow(image)  
+    elif display == 'internal':
+        plt.imshow(cv2.cvtColor(image_with_boxes, cv2.COLOR_BGR2RGB))  
         plt.axis('off')   
-        plt.show()         
+        plt.show()        
 
 
 
