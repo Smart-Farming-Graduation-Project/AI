@@ -7,8 +7,9 @@ from PIL import Image
 import time
 import datetime
 from ultralytics import YOLO
-from flask import Flask, json, jsonify, render_template, request,redirect
+from flask import Flask, json, jsonify, render_template, request,redirect, send_file
 from werkzeug.exceptions import HTTPException
+import os
 
 app = Flask(__name__)
 
@@ -42,7 +43,6 @@ colors = {
 @app.route("/")
 def hello_world():
     return render_template("index.html")
-img = ""
 
 @app.route("/image",methods=["POST"])
 def upload():
@@ -50,9 +50,8 @@ def upload():
     Call this API to run models on uploaded image
     return: JSON response
     """
-    global img
     global model
-    # global mobilenet_model
+    global mobilenet_model
     global colors
     global custom_class_names
     if "image" not in request.files:
@@ -96,20 +95,15 @@ def upload():
         cv2.putText(image, label_1, (label_x, label_y - label_size_2[1] - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
         cv2.putText(image, label_2, (label_x, label_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
 
+    #save the image in local filesystem and use datetime.now() to avoid overriding any existing files
+    filename = fr"images{os.sep}{datetime.datetime.now().timestamp()}.jpg" 
 
-    img = json.dumps(image.tolist())
-    
-    return redirect("/view")
+    cv2.imwrite(filename,image)
+
+    return send_file(filename , mimetype="image/jpeg")
 
 
-# testing route
-@app.route("/view")
-def view():
-    #  convert json to image
-    image = json.loads(img)
-    image = np.array(image, dtype=np.uint8)
-   
-    image = Image.fromarray(image)
-    image.show()
-    print('All Done 👌')
-    return "<p>Image displayed</p>"
+
+
+if __name__ == "__main__":
+    app.run()
