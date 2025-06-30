@@ -1,0 +1,80 @@
+<!-- FILE: disease_detection.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Disease Detection</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Unified Navbar -->
+    <nav>
+        <a href="/">Home</a>
+        <a href="/disease-detection">Disease Detection</a>
+        <a href="/weed-detection">Weed Detection</a>
+        <a href="/rag-chatbot">Assistant</a>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1>🩺 Disease Detection</h1>
+        <form id="detectForm" enctype="multipart/form-data">
+            <input type="file" name="file" id="fileInput" required>
+            <button type="submit">Diagnose</button>
+        </form>
+
+        <div id="imagePreview" style="margin-top: 20px;"></div>
+        <div id="resultBox" class="highlight-box" style="margin-top: 20px;"></div>
+        <div id="treatmentBox" class="highlight-box" style="margin-top: 20px;"></div>
+    </div>
+
+    <!-- JS Logic -->
+    <script>
+        document.getElementById("detectForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const fileInput = document.getElementById("fileInput");
+            if (!fileInput.files[0]) return alert("Please upload an image");
+
+            // Clear previous results
+            document.getElementById("resultBox").innerHTML = `<p>🔍 Processing...</p>`;
+            document.getElementById("imagePreview").innerHTML = ``;
+            document.getElementById("treatmentBox").innerHTML = ``;
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            try {
+                const response = await fetch("/api/disease-detection", { method: "POST", body: formData });
+                const data = await response.json();
+
+                if (data.image_url) {
+                    document.getElementById("imagePreview").innerHTML = `
+                        <img src="${data.image_url}" alt="Detected Disease" class="preview-image" style="max-width: 400px; border-radius: 8px;">
+                    `;
+                }
+
+                const diseases = data.diseases && data.diseases.length > 0
+                    ? data.diseases.join(", ")
+                    : "No diseases detected.";
+
+                document.getElementById("resultBox").innerHTML = `
+                    <h3>Detected Diseases:</h3>
+                    <p>${diseases}</p>
+                `;
+
+                const treatment = data.treatment || "No treatment found.";
+                document.getElementById("treatmentBox").innerHTML = `
+                    <h3>Treatment Suggestion:</h3>
+                    <p style="line-height: 1.6;">${treatment}</p>
+                `;
+
+            } catch (err) {
+                console.error("Detection error:", err);
+                document.getElementById("resultBox").innerHTML = `<p>Error occurred. Please try again.</p>`;
+                document.getElementById("treatmentBox").innerHTML = ``;
+            }
+        });
+    </script>
+</body>
+</html>

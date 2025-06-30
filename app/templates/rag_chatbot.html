@@ -1,0 +1,73 @@
+<!-- FILE: rag_chatbot.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Agri Assistant - Chatbot</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav>
+        <a href="/">Home</a>
+        <a href="/disease-detection">Disease Detection</a>
+        <a href="/weed-detection">Weed Detection</a>
+        <a href="/rag-chatbot">Assistant</a>
+    </nav>
+
+    <!-- Chat UI -->
+    <div class="container">
+        <div class="chat-header">
+            <h1>🧠 TomBot Assistant</h1>
+            <p>Ask any question related to agriculture, pests, diseases, or treatments.</p>
+        </div>
+
+        <div class="chat-box" id="chatPanel" style="min-height: 300px; border: 1px solid #ccc; padding: 1rem; border-radius: 8px; overflow-y: auto; margin-bottom: 1rem;">
+            <!-- Chat messages will be inserted here -->
+        </div>
+
+        <form id="chatForm" style="display: flex; gap: 10px;">
+            <input type="text" id="userInput" placeholder="Type your question..." style="flex: 1; padding: 0.5rem;" required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <!-- JS -->
+    <script>
+        const form = document.getElementById("chatForm");
+        const input = document.getElementById("userInput");
+        const panel = document.getElementById("chatPanel");
+
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const question = input.value.trim();
+            if (!question) return;
+
+            // Show user message
+            panel.innerHTML += `<div><strong>You:</strong> ${question}</div>`;
+            input.value = "";
+
+            try {
+                const res = await fetch("/api/chatbot", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ user_input: question })
+                });
+
+                const data = await res.json();
+                if (data.response) {
+                    panel.innerHTML += `<div><strong>Bot:</strong> ${data.response}</div>`;
+                    panel.scrollTop = panel.scrollHeight;
+                } else {
+                    panel.innerHTML += `<div><strong>Bot:</strong> Sorry, I couldn’t understand that.</div>`;
+                }
+            } catch (err) {
+                console.error(err);
+                panel.innerHTML += `<div><strong>Bot:</strong> Error processing your request.</div>`;
+            }
+        });
+    </script>
+</body>
+</html>

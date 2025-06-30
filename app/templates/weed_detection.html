@@ -1,0 +1,68 @@
+ر<!-- FILE: weed_detection.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weed Detection</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Unified Navigation Bar -->
+    <nav>
+        <a href="/">Home</a>
+        <a href="/disease-detection">Disease Detection</a>
+        <a href="/weed-detection">Weed Detection</a>
+        <a href="/rag-chatbot">Assistant</a>
+    </nav>
+
+    <!-- Main Section -->
+    <div class="container">
+        <h1>🌿 Weed Detection</h1>
+        <form id="weedForm" enctype="multipart/form-data">
+            <input type="file" name="file" id="weedInput" required>
+            <button type="submit">Detect Weeds</button>
+        </form>
+
+        <div id="weedImage" style="margin-top: 20px;"></div>
+        <div id="weedResult" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        document.getElementById("weedForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const input = document.getElementById("weedInput");
+            if (!input.files[0]) return alert("Please upload an image");
+
+            const formData = new FormData();
+            formData.append("file", input.files[0]);
+
+            try {
+                const res = await fetch("/api/weed-detection", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                if (data.image_url) {
+                    document.getElementById("weedImage").innerHTML = `
+                        <img src="${data.image_url}" alt="Detected Weeds" class="preview-image" style="max-width: 400px; border-radius: 8px;">
+                    `;
+                }
+
+                document.getElementById("weedResult").innerHTML = `
+                    <h3>Result:</h3>
+                    <p>${data.has_weed ? "🌱 Weeds Detected!" : "✅ No Weeds Found."}</p>
+                    <p><strong>Confidence:</strong> ${data.confidence}</p>
+                `;
+            } catch (error) {
+                console.error("Error detecting weeds:", error);
+                document.getElementById("weedResult").innerHTML = `
+                    <h3>Error</h3><p>Failed to detect weeds. Please try again.</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
